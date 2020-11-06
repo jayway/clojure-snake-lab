@@ -16,9 +16,8 @@
 
 ;; direction = NORTH|EAST|SOUTH|WEST
 (defn move-snake [direction]
-  (let [position (first (game-state :snake))]
-    (reset! game-state (assoc game-state :snake [5 5]))
-    ))
+  (let [position (first (@game-state :snake))]
+    (swap! game-state assoc :snake [[5 6]])))
 
 ;; .send res (clj->js (move-snake "NORTH"))
 (defn handle-move [req res] (.send res (clj->js (move-snake "NORTH"))))
