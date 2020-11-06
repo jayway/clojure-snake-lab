@@ -1,10 +1,12 @@
-(ns npmdemo.core
+(ns snake.core
   (:require ["express" :as express]))
 
 ;; currently broken in shadow-cljs
 (set! *warn-on-infer* true)
 
 (defonce server (atom nil))
+
+(defn print-hello [] "hello")
 
 (defn start-server []
   (println "Starting server")

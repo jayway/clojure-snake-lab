@@ -7,9 +7,9 @@
 
  :builds
  {:app
-  {:main npmdemo.core/main
+  {:main snake.core/main
    :target :node-script
-   :output-to "npmdemo.js"
+   :output-to "build.js"
    :devtools
-   {:after-load npmdemo.core/start!
-    :before-load npmdemo.core/stop!}}}}
+   {:after-load snake.core/start!
+    :before-load snake.core/stop!}}}}
