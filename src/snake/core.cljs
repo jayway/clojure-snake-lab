@@ -14,11 +14,21 @@
 
 (defn print-hello [] "hello")
 
+;; direction = NORTH|EAST|SOUTH|WEST
+(defn move-snake [direction]
+  (let [position (first (game-state :snake))]
+    (reset! game-state (assoc game-state :snake [5 5]))
+    ))
+
+;; .send res (clj->js (move-snake "NORTH"))
+(defn handle-move [req res] (.send res (clj->js (move-snake "NORTH"))))
+
 (defn start-server []
   (println "Starting server")
   (let [app (express)]
     (.get app "/" (fn [req res] (.send res "Hello, world")))
     (.get app "/start" (fn [req res] (.send res (clj->js (deref game-state)))))
+    (.get app "/move" handle-move)
     (.listen app 3000 (fn [] (println "Example app listening on port 3000!")))))
 
 (defn start! []

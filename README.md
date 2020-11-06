@@ -3,7 +3,7 @@ Competence development lab for creating a snake game in ClojureScript
 
 # API
 /start -> GAME_STATE
-/move?game=id&direction=[NORTH|EAST|SOUTH|WEST] -> GAME_STATE 
+/move?direction=[NORTH|EAST|SOUTH|WEST] -> GAME_STATE 
 
 # Game State
 ```
