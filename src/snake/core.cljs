@@ -1,6 +1,7 @@
 (ns snake.core
   (:require ["express" :as express]
-            [snake.game :as game]))
+            [snake.game :as game]
+            [applied-science.js-interop :as j]))
 
 ;; currently broken in shadow-cljs
 (set! *warn-on-infer* true)
@@ -13,7 +14,7 @@
 (defn start-server []
   (println "Starting server")
   (let [app (express)]
-    (.get app "/" (fn [_req res] (.send res "Hello, world")))
+    (.get app "/" (fn [req res] (.send res (clj->js (j/get req :query)))))
     (.get app "/start" (fn [_req res] (.send res (clj->js (deref game/state)))))
     (.get app "/move" handle-move)
     (.listen app 3000 (fn [] (println "Example app listening on port 3000!")))))
