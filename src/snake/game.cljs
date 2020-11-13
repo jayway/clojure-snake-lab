@@ -11,14 +11,17 @@
 (defn within-positions? [positions position]
   (boolean (some #{position} positions)))
 
+(defn not-within? [positions position]
+  (not (within-positions? positions position)))
+
 (defn within-world? [width height position]
   (let [[x y] position]
     (and (>= x 0) (<= x width) (>= y 0) (<= y height))))
 
 (defn legal-position? [world-width world-height snake position]
-  (every-pred
-   (partial within-world? world-width world-height)
-   (partial within-positions? snake)
+  ((every-pred
+    (partial within-world? world-width world-height)
+    (partial not-within? snake))
    position))
 
 (defn calculate-new-head-position [current direction]
@@ -33,5 +36,8 @@
 
 ;; direction = NORTH|EAST|SOUTH|WEST
 (defn move-snake [direction]
-  (let [head (first (@state :snake))]
-    (swap! state assoc :snake [[5 6]])))
+  (let [{width :width height :height snake :snake} @state
+        current-head (first snake)
+        new-head (calculate-new-head-position current-head direction)]
+    (when (legal-position? width height snake new-head)
+      (swap! state assoc :snake (reposition-snake snake new-head)))))
