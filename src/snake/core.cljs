@@ -1,32 +1,20 @@
 (ns snake.core
-  (:require ["express" :as express]))
+  (:require ["express" :as express]
+            [snake.game :as game]))
 
 ;; currently broken in shadow-cljs
 (set! *warn-on-infer* true)
 
 (defonce server (atom nil))
 
-(defonce game-state (atom {:alive true
-                           :width 15
-                           :height 15
-                           :snake [[0 0]]
-                           :fruit [10 10]}))
-
-(defn print-hello [] "hello")
-
-;; direction = NORTH|EAST|SOUTH|WEST
-(defn move-snake [direction]
-  (let [position (first (@game-state :snake))]
-    (swap! game-state assoc :snake [[5 6]])))
-
 ;; .send res (clj->js (move-snake "NORTH"))
-(defn handle-move [req res] (.send res (clj->js (move-snake "NORTH"))))
+(defn handle-move [_req res] (.send res (clj->js (game/move-snake "NORTH"))))
 
 (defn start-server []
   (println "Starting server")
   (let [app (express)]
-    (.get app "/" (fn [req res] (.send res "Hello, world")))
-    (.get app "/start" (fn [req res] (.send res (clj->js (deref game-state)))))
+    (.get app "/" (fn [_req res] (.send res "Hello, world")))
+    (.get app "/start" (fn [_req res] (.send res (clj->js (deref game/state)))))
     (.get app "/move" handle-move)
     (.listen app 3000 (fn [] (println "Example app listening on port 3000!")))))
 
