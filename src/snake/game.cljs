@@ -39,5 +39,6 @@
   (let [{width :width height :height snake :snake} @state
         current-head (first snake)
         new-head (calculate-new-head-position current-head direction)]
-    (when (legal-position? width height snake new-head)
-      (swap! state assoc :snake (reposition-snake snake new-head)))))
+    (if (legal-position? width height snake new-head)
+      (swap! state assoc :snake (reposition-snake snake new-head))
+      (swap! state assoc :alive false))))
