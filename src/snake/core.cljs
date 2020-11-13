@@ -12,29 +12,38 @@
                            :snake [[0 0] [1 0] [2 0]]
                            :fruit [10 10]}))
 
-;; Helpful for debugging in REPL
-(defonce NORTH "NORTH")
-(defonce EAST "EAST")
-(defonce SOUTH "SOUTH")
-(defonce WEST "WEST")
-
 (defn update-head-position [direction position]
   (case direction
-    "NORTH" [(first position) (+ 1 (second position))]
-    "EAST" [(+ 1 (first position)) (second position)]
-    "SOUTH" [(first position) (- 1 (second position))]
-    "WEST" [(- 1 (first position)) (second position)]
+    "NORTH" (map + [0 1] position)
+    "EAST" (map + [1 0] position)
+    "SOUTH" (map + [0 -1] position)
+    "WEST" (map + [-1 0] position)
     position))
+
+(defn check-intersection [position positions]
+  (> (count (filter #(= % position) positions)) 0))
 
 (defn get-snake-position [direction snake-coordinates]
   (let [head (first snake-coordinates)
         body (rest snake-coordinates)
         new-head-pos (update-head-position direction head)]
-    (concat [new-head-pos head] (butlast body))))
+    (cond
+      (check-intersection new-head-pos body) []
+      :else (concat [new-head-pos head] (butlast body)))))
+
+(defonce possible-spots (for [x (range (@game-state :width)) y (range (@game-state :height))] [x y]))
+(defn generate-new-fruit [snake]
+  (let [remaining-spots (filter #(not (check-intersection % snake)) possible-spots)]
+    (rand-nth remaining-spots)))
 
 (defn move-snake [direction]
-  (let [position (@game-state :snake)]
-    (swap! game-state assoc :snake (get-snake-position direction position))))
+  (let [snake (@game-state :snake)
+        fruit (@game-state :fruit)
+        updated-snake (get-snake-position direction snake)
+        alive (> (count updated-snake) 0)
+        reached-fruit (= true alive (check-intersection fruit updated-snake))]
+    (when alive (swap! game-state assoc :snake updated-snake))
+    (when reached-fruit (swap! game-state assoc :fruit (generate-new-fruit updated-snake)))))
 
 (defn handle-move [req res]
   (let [query-params (.-query req) direction (.-direction query-params)]
