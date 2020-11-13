@@ -12,21 +12,63 @@
                            :snake [[0 0]]
                            :fruit [10 10]}))
 
-(defn print-hello [] "hello")
+(defn generate-fruit []
+  (let [new-fruit [(rand-int (+ 1 (@game-state :width)))
+                   (rand-int (+ 1 (@game-state :height)))]]
+    (println new-fruit)
+    (swap! game-state assoc :fruit new-fruit)))
+
+(defn is-inside-bounds [position]
+  (let [x (first position)
+        y (last position)]
+    (and
+     (>= x 0)
+     (<= x (@game-state :width))
+     (>= y 0)
+     (<= y (@game-state :height)))))
+
+(defn add-positions [pos1 pos2]
+  [(+ (first pos1) (first pos2))
+   (+ (last pos1) (last pos2))])
+
+(defn direction-to-pos-diff [direction]
+  (case direction
+    "NORTH" [0 1]
+    "EAST" [1 0]
+    "SOUTH" [0 -1]
+    "WEST" [-1 0]))
+
+;; add a new head on new position (if not on fruit)
+;; remove the last position
+(defn move-snake [new-head snake]
+  (let [new-snake (cons new-head snake)
+        eats (= new-head (@game-state :fruit))]
+    (when eats (generate-fruit))
+    (if eats
+      new-snake
+      (drop-last new-snake))))
+
+(defn move [direction snake]
+  (let [new-head (add-positions (first snake) (direction-to-pos-diff direction))]
+    (if (is-inside-bounds new-head)
+      (move-snake new-head snake)
+      snake)))
+
 
 ;; direction = NORTH|EAST|SOUTH|WEST
-(defn move-snake [direction]
-  (let [position (first (@game-state :snake))]
-    (swap! game-state assoc :snake [[5 6]])))
+(defn run-game [direction]
+  (let [snake (@game-state :snake)]
+    (swap! game-state assoc :snake (move direction snake))))
 
-;; .send res (clj->js (move-snake "NORTH"))
-(defn handle-move [req res] (.send res (clj->js (move-snake "NORTH"))))
+(defn handle-move [req res]
+  (let [direction (.-direction (.-query req))]
+    (.send res (clj->js (run-game direction)))))
 
 (defn start-server []
   (println "Starting server")
   (let [app (express)]
-    (.get app "/" (fn [req res] (.send res "Hello, world")))
-    (.get app "/start" (fn [req res] (.send res (clj->js (deref game-state)))))
+    (.get app "/" (fn [_ res] (.send res "Hello, world")))
+    (.get app "/start" (fn [_ res] (.send res (clj->js (deref game-state)))))
     (.get app "/move" handle-move)
     (.listen app 3000 (fn [] (println "Example app listening on port 3000!")))))
 
@@ -42,3 +84,9 @@
 (defn main []
   ;; executed once, on startup, can do one time setup here
   (start!))
+
+;; TODO:
+;; enforce input direction
+;; lose when going into wall? or end up on other side?
+;; hunger?
+;; points?
