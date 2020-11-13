@@ -1,9 +1,12 @@
 <h1>Super snake visualisation tool!</h1>
+<h3>Score: <span id="score">0</span></h3>
 <canvas id="canvas" width="300" height="300"></canvas>
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
   const canvas = document.getElementById('canvas')
+  const score = document.getElementById('score')
+
   const ctx = canvas.getContext('2d');
   socket.on('update', function (data) {
     console.log(data);
@@ -16,6 +19,7 @@
   }
 
   function updateSnake(state) {
+    score.innerHTML = state.score.toString(10)
     const scaleX = canvas.width / state.width;
     const scaleY = canvas.height / state.height;
     const scale = Math.min(scaleX, scaleY);

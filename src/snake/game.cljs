@@ -18,6 +18,13 @@
       (repeatedly
        (fn [] [(rand-int width) (rand-int height)]))))))
 
+(defn valid-pos? [pos state]
+  (let [[x y] pos]
+  (and
+   (<= 0 x (dec (:width state)))
+   (<= 0 y (dec (:height state)))
+   (every? #(not= % pos) (:snake state)))))
+
 (defn update-game [game-state direction]
   (let [snake (game-state :snake)
         next-head-pos (move (first snake) direction)
@@ -26,5 +33,7 @@
         new-fruit (if is-fruit (new-fruit game-state) (game-state :fruit))
         snake-body (if is-fruit snake (butlast snake))
         new-snake (cons next-head-pos snake-body)]
-    (assoc game-state :snake new-snake :fruit new-fruit :score new-score)))
+    (if (valid-pos? next-head-pos game-state)
+      (assoc game-state :snake new-snake :fruit new-fruit :score new-score)
+      (assoc game-state :alive false))))
 

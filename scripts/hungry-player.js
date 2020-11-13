@@ -19,9 +19,10 @@ function makeMove({ width, height, snake, fruit}) {
     const [x, y] = snake[0];
     const [fx, fy] = fruit;
 
+    if (fy < y) return 'SOUTH';
+    if (fy > y) return 'NORTH';
     if (fx < x) return 'WEST';
     if (fx > x) return 'EAST';
-    if (fy < y) return 'SOUTH';
     return 'NORTH';
 }
 
