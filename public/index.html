@@ -1,6 +1,6 @@
 <h1>Super snake visualisation tool!</h1>
 <h3>Score: <span id="score">0</span></h3>
-<canvas id="canvas" width="300" height="300"></canvas>
+<canvas id="canvas" width="400" height="400"></canvas>
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
@@ -14,8 +14,8 @@
   });
 
   function clearBoard() {
-      ctx.fillStyle = 'rgb(215, 215, 215)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'rgb(215, 215, 215)'
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   function updateSnake(state) {
@@ -23,11 +23,11 @@
     const scaleX = canvas.width / state.width;
     const scaleY = canvas.height / state.height;
     const scale = Math.min(scaleX, scaleY);
-    
+
     function drawBall([x, y]) {
-        ctx.beginPath();
-        ctx.arc(x * scale + scale/2, y * scale + scale/2, scale / 2, 2 * Math.PI, false)
-        ctx.fill();
+      ctx.beginPath();
+      ctx.arc(x * scale + scale / 2, y * scale + scale / 2, scale / 2, 2 * Math.PI, false)
+      ctx.fill();
     }
 
     clearBoard()

@@ -1,44 +1,63 @@
 (ns snake.game
   (:require [clojure.string :as str]))
 
-
-(defonce state (atom {:alive true
-                      :width 15
-                      :height 15
-                      :snake [[8 7] [7 7] [6 7]]
-                      :fruit [10 10]}))
-
 (defn within-positions? [positions position]
   (boolean (some #{position} positions)))
 
-(defn not-within? [positions position]
-  (not (within-positions? positions position)))
+(def not-within? (complement within-positions?))
 
 (defn within-world? [width height position]
   (let [[x y] position]
     (and (>= x 0) (<= x width) (>= y 0) (<= y height))))
 
-(defn legal-position? [world-width world-height snake position]
+(defn legal-position? [state position]
   ((every-pred
-    (partial within-world? world-width world-height)
-    (partial not-within? snake))
+    (partial within-world? (:width state) (:height state))
+    (partial not-within? (:snake state)))
    position))
+
+(def illeagal-position? (complement legal-position?))
+
+(defn snake-head-ok? [state position]
+  ((every-pred
+    (partial within-world? (:width state) (:height state))
+    (partial not-within? (rest (:snake state))))
+   position))
+
+(defn at-fruit? [head fruit] (= head fruit))
+
+(defn eaten-fruit? [state]
+  (at-fruit? (first (:snake state)) (:fruit state)))
+
+(defn new-fruit [state]
+  (let [new-fruit (first (drop-while #(illeagal-position? state %)
+                                     (repeatedly #(vec [(rand-int (:width state)) (rand-int (:height state))]))))]
+    (assoc state :fruit new-fruit)))
 
 (defn calculate-new-head-position [current direction]
   (condp = (str/upper-case direction)
     "NORTH" (map + [0 1] current)
     "EAST"  (map + [1 0] current)
     "SOUTH" (map + [0 -1] current)
-    "WEST"  (map + [-1 0] current)))
+    "WEST"  (map + [-1 0] current)
+    current))
 
-(defn reposition-snake [snake new-head]
-  (into [new-head] (pop snake)))
+(defn reposition-snake [state new-head]
+  (into [new-head] (if (at-fruit? new-head (:fruit state))
+                     (:snake state)
+                     (pop (:snake state)))))
 
-;; direction = NORTH|EAST|SOUTH|WEST
-(defn move-snake [direction]
-  (let [{width :width height :height snake :snake} @state
-        current-head (first snake)
+(defn move-snake
+  "Possible directions: NORTH/EAST/SOUTH/WEST"
+  [state direction]
+  (let [current-head (first (:snake state))
         new-head (calculate-new-head-position current-head direction)]
-    (if (legal-position? width height snake new-head)
-      (swap! state assoc :snake (reposition-snake snake new-head))
-      (swap! state assoc :alive false))))
+    (if (snake-head-ok? state new-head)
+      (assoc state :snake (reposition-snake state new-head))
+      (assoc state :alive false))))
+
+(defn tick [state direction]
+  (-> state
+      (move-snake direction)
+      (cond-> (eaten-fruit? state) (update :score inc))
+      (cond-> (eaten-fruit? state) (new-fruit))))
