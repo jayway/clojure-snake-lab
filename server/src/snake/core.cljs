@@ -15,7 +15,6 @@
 (defn generate-fruit []
   (let [new-fruit [(rand-int (+ 1 (@game-state :width)))
                    (rand-int (+ 1 (@game-state :height)))]]
-    (println new-fruit)
     (swap! game-state assoc :fruit new-fruit)))
 
 (defn is-inside-bounds [position]
@@ -27,16 +26,13 @@
      (>= y 0)
      (<= y (@game-state :height)))))
 
-(defn add-positions [pos1 pos2]
-  [(+ (first pos1) (first pos2))
-   (+ (last pos1) (last pos2))])
-
-(defn direction-to-pos-diff [direction]
-  (case direction
-    "NORTH" [0 1]
-    "EAST" [1 0]
-    "SOUTH" [0 -1]
-    "WEST" [-1 0]))
+(defn move-head [head direction]
+  (let [x (first head) y (last head)]
+   (case direction
+    "NORTH" [x (inc y)]
+    "EAST" [(inc x) y]
+    "SOUTH" [x (dec y)]
+    "WEST" [(dec x) y])))
 
 ;; add a new head on new position (if not on fruit)
 ;; remove the last position
@@ -49,7 +45,7 @@
       (drop-last new-snake))))
 
 (defn move [direction snake]
-  (let [new-head (add-positions (first snake) (direction-to-pos-diff direction))]
+  (let [new-head (move-head (first snake) direction)]
     (if (is-inside-bounds new-head)
       (move-snake new-head snake)
       snake)))
