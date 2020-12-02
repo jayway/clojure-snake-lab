@@ -1,0 +1,15 @@
+{
+  "scripts": {
+    "watch": "shadow-cljs watch app",
+    "watch-test": "shadow-cljs watch test",
+    "start": "node build.js",
+    "start-test": "node build/tests.js || true"
+  },
+  "devDependencies": {
+    "shadow-cljs": "^2.0.51"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.16.2"
+  }
+}

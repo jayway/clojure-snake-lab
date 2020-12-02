@@ -1,14 +1,12 @@
 {
   "scripts": {
     "watch": "shadow-cljs watch app",
-    "watch-test": "shadow-cljs watch test",
+    "watch-test": "shadow-cljs watch server/test",
     "start": "node build.js",
     "start-test": "node build/tests.js || true"
   },
   "devDependencies": {
     "shadow-cljs": "^2.0.51"
   },
-  "dependencies": {
-    "express": "^4.16.2"
-  }
+  "dependencies": {}
 }

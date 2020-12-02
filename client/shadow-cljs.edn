@@ -1,0 +1,12 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src"]
+
+ :dependencies
+ [[cider/cider-nrepl "0.21.0"] [cljs-http "0.1.46"]]
+
+ :builds
+ {:app
+  {:target :browser
+   :modules {:main {:init-fn client.core/main}}
+   :output-to "build.js"}}}
