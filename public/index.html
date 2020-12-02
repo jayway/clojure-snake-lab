@@ -1,0 +1,42 @@
+<h1>Super snake visualisation tool!</h1>
+<h3>Score: <span id="score">0</span></h3>
+<canvas id="canvas" width="300" height="300"></canvas>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const canvas = document.getElementById('canvas')
+  const score = document.getElementById('score')
+
+  const ctx = canvas.getContext('2d');
+  socket.on('update', function (data) {
+    console.log(data);
+    updateSnake(data)
+  });
+
+  function clearBoard() {
+      ctx.fillStyle = 'rgb(215, 215, 215)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  function updateSnake(state) {
+    score.innerHTML = state.score.toString(10)
+    const scaleX = canvas.width / state.width;
+    const scaleY = canvas.height / state.height;
+    const scale = Math.min(scaleX, scaleY);
+    
+    function drawBall([x, y]) {
+        ctx.beginPath();
+        ctx.arc(x * scale + scale/2, y * scale + scale/2, scale / 2, 2 * Math.PI, false)
+        ctx.fill();
+    }
+
+    clearBoard()
+    ctx.fillStyle = 'rgb(200, 0, 0)';
+    drawBall(state.fruit);
+
+    ctx.fillStyle = 'rgba(0, 0, 200, 0.5)';
+    state.snake.forEach(drawBall);
+  }
+
+  clearBoard()
+</script>
