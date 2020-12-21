@@ -4,7 +4,7 @@
             [snake.game :as game]))
 
 (defn start-game [_req res]
-  (let [new-game (reset! state/game state/initial)]
+  (let [new-game (reset! state/game (snake.state/new-game))]
     (.send res (clj->js new-game))))
 
 (defn move [req res]

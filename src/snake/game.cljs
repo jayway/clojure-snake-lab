@@ -29,6 +29,16 @@
 (defn eaten-fruit? [state]
   (at-fruit? (first (:snake state)) (:fruit state)))
 
+(defn die-of-hunger?
+  "Snake must eat within 7s"
+  [state]
+  (< (+ 7000 (:last-eaten state)) (js/Date.now)))
+
+(defn die-of-boredom?
+  "Snake must move every 300ms"
+  [state]
+  (< (+ 300 (:last-moved state)) (js/Date.now)))
+
 (defn new-fruit [state]
   (let [new-fruit (first (drop-while #(illeagal-position? state %)
                                      (repeatedly #(vec [(rand-int (:width state)) (rand-int (:height state))]))))]
@@ -53,11 +63,15 @@
   (let [current-head (first (:snake state))
         new-head (calculate-new-head-position current-head direction)]
     (if (snake-head-ok? state new-head)
-      (assoc state :snake (reposition-snake state new-head))
+      (-> state
+          (assoc :snake (reposition-snake state new-head))
+          (assoc :last-moved (js/Date.now)))
       (assoc state :alive false))))
 
 (defn tick [state direction]
   (-> state
-      (move-snake direction)
+      (cond-> (die-of-hunger? state) (assoc :alive false))
+      (cond-> (die-of-boredom? state) (assoc :alive false))
+      (cond-> (:alive state) (move-snake direction))
       (cond-> (eaten-fruit? state) (update :score inc))
       (cond-> (eaten-fruit? state) (new-fruit))))
