@@ -23,7 +23,7 @@
 (defn start-server []
   (println "Starting server")
   (let [app (express)
-        http (.listen app 3000 (fn [] (println "Example app listening on port 3000!")))]
+        http (.listen app 3000 (fn [] (println "Clojuser-snake listening on port 3000!")))]
     (start-sockets http)
     (.use app (.static express "public"))
     (.get app "/test" (fn [req res] (.send res (clj->js (j/get req :query)))))
