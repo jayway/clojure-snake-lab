@@ -28,7 +28,9 @@
     (.use app (.static express "public"))
     (.get app "/test" (fn [req res] (.send res (clj->js (j/get req :query)))))
     (.get app "/start" handlers/start-game)
-    (.get app "/move" handlers/move)))
+    (.get app "/start/:nickname/training" handlers/start-training-game)
+    (.get app "/move" handlers/move)
+    (.get app "/move/:nickname/training" handlers/training-move)))
 
 (defn start! []
   ;; called by main and after reloading code

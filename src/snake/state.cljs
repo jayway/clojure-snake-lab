@@ -1,5 +1,7 @@
 (ns snake.state)
 
+(defonce initail-server-state {:players {}})
+
 (defonce initial {:alive true
                   :last-eaten nil
                   :last-moved nil
@@ -10,6 +12,8 @@
                   :fruit [10 10]})
 
 (defonce game (atom initial))
+
+(defonce games (atom initail-server-state))
 
 (defn new-game []
   (-> initial
