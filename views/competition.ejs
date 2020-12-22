@@ -1,0 +1,28 @@
+<html lang="en">
+
+<head>
+  <%- include('./partials/styling'); %>
+    <title>
+      Snake - competition
+    </title>
+    <%- include('./partials/js') %>
+</head>
+
+<body>
+  <header>
+    <h1>Highscores</h1>
+    <ol id="highscores"></ol>
+  </header>
+
+  <div class="competition-displays">
+    <% for (const [nickname, game] of Object.entries(players)) { if (!game.training) { %>
+      <%- include('./partials/game-display', {heading: `${nickname}`, nickname }); %>
+        <% }} %>
+  </div>
+</body>
+
+<script>
+  createHighscoreUpdater();
+</script>
+
+</html>

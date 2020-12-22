@@ -29,19 +29,19 @@ function makeMove({ width, height, snake, fruit }) {
 }
 
 async function main() {
-  let data = await getUrl("http://localhost:3000/start/whatnot/training");
+  let data = await getUrl("http://localhost:3000/start/whatnot");
   while (true) {
     await wait(100);
     if (data.alive) {
       const direction = makeMove(data);
       console.log("MOVING", direction);
       data = await getUrl(
-        `http://localhost:3000/move/whatnot/training?direction=${direction}`
+        `http://localhost:3000/move/whatnot?direction=${direction}`
       );
       if (data.alive === false) console.log("died");
     } else {
       console.log("WTF!", data.alive);
-      data = await getUrl("http://localhost:3000/start/whatnot/training");
+      data = await getUrl("http://localhost:3000/start/whatnot");
     }
   }
 }

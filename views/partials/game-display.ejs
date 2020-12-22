@@ -1,0 +1,15 @@
+<section class="crt">
+  <h2>
+    <%= heading %>
+  </h2>
+  <div class="canvas-wrap">
+    <div class="canvas-inner-wrap">
+      <canvas id="<%= nickname %>-canvas" width="400" height="400"></canvas>
+    </div>
+  </div>
+  <h3>Score: <span id="<%= nickname %>-score">0</span></h3>
+</section>
+
+<script>
+  createGameUpdater('<%= nickname %>')
+</script>

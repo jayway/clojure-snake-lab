@@ -3,30 +3,29 @@
             [snake.state :as state]
             [snake.game :as game]))
 
-(defn start-game [_req res]
-  (let [new-game (reset! state/game (snake.state/new-game))]
-    (.send res (clj->js new-game))))
+(defn start-game [mode]
+  (fn [req res]
+    (when-let [nickname (j/get-in req [:params :nickname])]
+      (let [new-game (-> (snake.state/new-game)
+                         (assoc :training (= mode :training)))]
+        (swap! state/games assoc-in [:players nickname] new-game)
+        (.send res (clj->js new-game))))))
 
 (defn move [req res]
-  (let [direction (j/get-in req [:query :direction])]
-    (if (not (:alive @state/game))
-      (.send res (clj->js @state/game))
-      (do (reset! state/game (game/tick @state/game direction))
-          (.send res (clj->js @state/game))))))
-
-(defn start-training-game [req res]
-  (when-let [nickname (j/get-in req [:params :nickname])]
-    (let [new-game (snake.state/new-game)]
-      (swap! state/games assoc-in [:players nickname] new-game)
-      (.send res (clj->js new-game)))))
-
-(defn training-move [req res]
   (when-let [nickname (j/get-in req [:params :nickname])]
     (let [direction (j/get-in req [:query :direction])
-          game (get-in @state/games [:players nickname])
-          new-game (game/tick game direction)
-          _ (println @state/games)]
+          game (get-in @state/games [:players nickname])]
       (if (not (:alive game))
         (.send res (clj->js game))
-        (do (swap! state/games assoc-in [:players nickname] new-game)
-            (.send res (clj->js new-game)))))))
+        (let [new-game (game/tick game direction)]
+          (when (and (not (:training new-game)) (not (:alive new-game)))
+            (swap! state/highscores assoc nickname (max (get @state/highscores nickname) (:score new-game))))
+          (swap! state/games assoc-in [:players nickname] new-game)
+          (.send res (clj->js new-game)))))))
+
+(defn training-view [req res]
+  (when-let [nickname (j/get-in req [:params :nickname])]
+    (.render res "training/index" (clj->js {:nickname nickname}))))
+
+(defn competition [_req res]
+  (.render res "competition" (clj->js {:players (:players @state/games)})))

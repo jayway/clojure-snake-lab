@@ -1,0 +1,15 @@
+<html lang="en">
+
+<head>
+  <%- include('../partials/styling'); %>
+    <title>
+      <%= nickname %>
+    </title>
+    <%- include('../partials/js') %>
+</head>
+
+<body>
+  <%- include('../partials/game-display', {heading: `${nickname} training grounds` }); %>
+</body>
+
+</html>
