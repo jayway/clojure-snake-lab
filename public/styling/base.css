@@ -15,7 +15,6 @@ body {
   align-items: center;
 }
 
-/*
 @keyframes flicker {
   0% {
     opacity: 0.27861;
@@ -140,7 +139,6 @@ body {
 .crt {
   animation: textShadow 1.6s infinite;
 }
-*/
 
 .canvas-wrap {
   border: 1px solid chartreuse;
