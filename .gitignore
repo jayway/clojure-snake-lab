@@ -19,6 +19,8 @@ pom.xml.asc
 .lein-*
 .nrepl-*
 .DS_Store
+.lsp
+.clj-kondo
 
 .hgignore
 .hg/
